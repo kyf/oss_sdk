@@ -23,10 +23,10 @@ func init() {
 		if err != nil {
 			logger(err)
 		}
-		oss.MkDir(BUCKET, group)
+		oss.MkDir(BUCKET, fmt.Sprintf("/%s", group))
 		oss.Create(BUCKET, path, string(img_content))
 
-		logger(fmt.Sprintf("file [%s] upload success!"))
+		logger(fmt.Sprintf("file [%s] upload success!", path))
 		result := map[string]string{
 			"status": "ok",
 			"path":   path,

@@ -125,7 +125,7 @@ func Init(access_id, access_key string, mlogger func(interface{})) {
 }
 
 func MkDir(bucket, resource string) int {
-	stdoss.SetOSSHeader("x-oss-acl", "primate")
+	stdoss.SetOSSHeader("x-oss-acl", "public-read")
 	stdoss.SetMethod(METHOD_PUT)
 	stdoss.SetBucket(bucket)
 	stdoss.SetContentType(MIMETYPE["default"])
@@ -148,6 +148,7 @@ func RmDir(bucket, resource string) int {
 }
 
 func Create(bucket, resource, content string) int {
+	stdoss.SetOSSHeader("x-oss-acl", "public-read")
 	stdoss.SetMethod(METHOD_PUT)
 	stdoss.SetBucket(bucket)
 	stdoss.SetContentType(MIMETYPE["jpg"])
@@ -170,6 +171,7 @@ func Remove(bucket, resource string) int {
 }
 
 func CreateBucket(bucket string) int {
+	stdoss.SetOSSHeader("x-oss-acl", "public-read")
 	stdoss.SetMethod(METHOD_PUT)
 	stdoss.SetBucket(bucket)
 	stdoss.SetContentType(MIMETYPE["default"])
