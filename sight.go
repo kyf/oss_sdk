@@ -15,6 +15,19 @@ func init() {
 		r.ParseForm()
 		data := r.Form
 		file_content := data.Get("file")
+		var result map[string]string
+		var jsonResult []byte
+		if strings.EqualFold(file_content, "") {
+			result = map[string]string{
+				"status": "error",
+				"msg":    "file is empty",
+			}
+
+			jsonResult, _ = json.Marshal(result)
+			w.Write(jsonResult)
+			return
+		}
+
 		file_content = strings.Replace(file_content, "data:image/jpg;base64,", "", -1)
 
 		oss.Init(OSS_ACCESS_ID, OSS_ACCESS_KEY, logger)
@@ -22,17 +35,36 @@ func init() {
 		img_content, err := base64.StdEncoding.DecodeString(file_content)
 		if err != nil {
 			logger(err)
+			result = map[string]string{
+				"status": "error",
+				"msg":    fmt.Sprintf("%v", err),
+			}
+
+			jsonResult, _ = json.Marshal(result)
+			w.Write(jsonResult)
+			return
+
 		}
-		oss.MkDir(BUCKET, fmt.Sprintf("/%s", group))
-		oss.Create(BUCKET, path, string(img_content))
+		statusCode := oss.MkDir(BUCKET, fmt.Sprintf("/%s", group))
+		statusCode = oss.Create(BUCKET, path, string(img_content))
+		if statusCode != 200 {
+			result = map[string]string{
+				"status": "error",
+				"msg":    "server occour error",
+			}
+
+			jsonResult, _ = json.Marshal(result)
+			w.Write(jsonResult)
+			return
+		}
 
 		logger(fmt.Sprintf("file [%s] upload success!", path))
-		result := map[string]string{
+		result = map[string]string{
 			"status": "ok",
 			"path":   path,
 		}
 
-		jsonResult, _ := json.Marshal(result)
+		jsonResult, _ = json.Marshal(result)
 		w.Write(jsonResult)
 	}
 }
