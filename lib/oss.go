@@ -97,6 +97,11 @@ func (o *oss) Do() (int, http.Header, []byte) {
 	if err != nil {
 		logger(err)
 	}
+
+	if res.StatusCode != 200 {
+		logger(body)
+	}
+
 	return res.StatusCode, res.Header, body
 }
 
