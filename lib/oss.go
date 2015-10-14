@@ -13,7 +13,8 @@ import (
 )
 
 const (
-	ENDPOINT   string = "oss-cn-beijing.aliyuncs.com"
+	//ENDPOINT   string = "oss-cn-beijing.aliyuncs.com"
+	ENDPOINT   string = "oss-cn-beijing-internal.aliyuncs.com"
 	GMT_LAYOUT string = "Mon, 2 Jan 2006 15:04:05 GMT"
 
 	METHOD_GET    string = "GET"
