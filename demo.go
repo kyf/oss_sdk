@@ -16,6 +16,10 @@ func init() {
 			oss.RemoveBucket(BUCKET)
 		*/
 		//oss.CreateBucket(BUCKET)
+		oss.Remove(BUCKET, "/sight/2015_10_14_14447987323049666151298498081.jpg")
+		oss.Remove(BUCKET, "/sight/2015_10_14_14447988769221438841298498081.jpg")
+		oss.Remove(BUCKET, "/sight/2015_10_14_14448006768876860831298498081.jpg")
+		oss.Remove(BUCKET, "/sight/2015_10_14_14448011257944723231298498081.jpg")
 		w.Write([]byte("done"))
 	}
 }
