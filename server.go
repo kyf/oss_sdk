@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	PORT           string = ":8060"
+	PORT           string = ":8010"
 	BUCKET         string = "/6ry-poi"
 	LAYOUT         string = "2006_01_02"
 	LOG_DIR        string = "./log/"
