@@ -5,6 +5,7 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -19,6 +20,10 @@ const (
 	METHOD_PUT    string = "PUT"
 	METHOD_DELETE string = "DELETE"
 	METHOD_POST   string = "POST"
+)
+
+var (
+	logger func(interface{})
 )
 
 type oss struct {
@@ -36,6 +41,10 @@ type oss struct {
 
 func New(access_id, access_key string) *oss {
 	return &oss{access_id: access_id, access_key: access_key, ossHeaders: make(map[string]string)}
+}
+
+func (o *oss) SetBucket(bucket string) {
+	o.bucket = bucket
 }
 
 func (o *oss) SetMethod(method string) {
@@ -59,14 +68,19 @@ func (o *oss) SetOSSHeader(key, value string) {
 }
 
 func (o *oss) PrepReq() {
+	o.urlString = fmt.Sprintf("http://%s%s%s", ENDPOINT, o.bucket, o.resource)
 	req, err := http.NewRequest(o.method, o.urlString, o.content)
+	if err != nil {
+		logger(err)
+	}
 	location, err := time.LoadLocation("GMT")
 	now := time.Now().In(location).Format(GMT_LAYOUT)
-	signature := generationSign(o.method, now, o.bucket, o.resource)
+	signature := generationSign(o.method, now, o.bucket, o.resource, o.access_key, o.contentType, o.ossHeaders)
 	req.Header.Set("Date", now)
 	req.Header.Set("Host", ENDPOINT)
-	req.Header.Set("Authorization", fmt.Sprintf("OSS %s:%s", OSS_ACCESS_ID, signature))
-	req.Header.Set("Content-Type", content_type)
+	req.Header.Set("Authorization", fmt.Sprintf("OSS %s:%s", o.access_id, signature))
+	req.Header.Set("Content-Type", o.contentType)
+
 	for k, v := range o.ossHeaders {
 		req.Header.Set(strings.ToUpper(k), v)
 	}
@@ -77,17 +91,20 @@ func (o *oss) Do() (int, http.Header, []byte) {
 	client := &http.Client{}
 	res, err := client.Do(o.req)
 	if err != nil {
-		//log
+		logger(err)
 	}
-	return res.StatusCode, res.Header, res.Body
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		logger(err)
+	}
+	return res.StatusCode, res.Header, body
 }
 
 func generationSign(method, date, bucket, resource, access_key, content_type string, headers map[string]string) string {
 	content_md5 := ""
-	content_type := ""
 	CanonicalizedOSSHeaders := ""
 	for k, v := range headers {
-		CanonicalizedOSSHeaders = fmt.Sprintf("%s%s:%s\n", CanonicalizedOSSHeaders, v, k)
+		CanonicalizedOSSHeaders = fmt.Sprintf("%s%s:%s\n", CanonicalizedOSSHeaders, k, v)
 	}
 	CanonicalizedResource := fmt.Sprintf("%s%s", bucket, resource)
 
@@ -100,28 +117,76 @@ func generationSign(method, date, bucket, resource, access_key, content_type str
 	return signature
 }
 
-var stdoss = New()
+var stdoss *oss
 
-func MkDir(bucket, resource string) {
+func Init(access_id, access_key string, mlogger func(interface{})) {
+	stdoss = New(access_id, access_key)
+	logger = mlogger
+}
+
+func MkDir(bucket, resource string) int {
 	stdoss.SetOSSHeader("x-oss-acl", "primate")
 	stdoss.SetMethod(METHOD_PUT)
 	stdoss.SetBucket(bucket)
-	stdoss.SetContentType("")
+	stdoss.SetContentType(MIMETYPE["default"])
 	stdoss.SetContent("")
 	stdoss.SetResource(fmt.Sprintf("%s/", resource))
 	stdoss.PrepReq()
-	status, header, body := stdoss.Do()
-	fmt.Println(status, body, header)
+	status, _, _ := stdoss.Do()
+	return status
 }
 
-func RmDir() {
-
+func RmDir(bucket, resource string) int {
+	stdoss.SetMethod(METHOD_DELETE)
+	stdoss.SetBucket(bucket)
+	stdoss.SetContentType(MIMETYPE["default"])
+	stdoss.SetContent("")
+	stdoss.SetResource(fmt.Sprintf("%s/", resource))
+	stdoss.PrepReq()
+	status, _, _ := stdoss.Do()
+	return status
 }
 
-func Create() {
-
+func Create(bucket, resource, content string) int {
+	stdoss.SetMethod(METHOD_PUT)
+	stdoss.SetBucket(bucket)
+	stdoss.SetContentType(MIMETYPE["jpg"])
+	stdoss.SetContent(content)
+	stdoss.SetResource(resource)
+	stdoss.PrepReq()
+	status, _, _ := stdoss.Do()
+	return status
 }
 
-func Remove() {
+func Remove(bucket, resource string) int {
+	stdoss.SetMethod(METHOD_DELETE)
+	stdoss.SetBucket(bucket)
+	stdoss.SetContentType(MIMETYPE["default"])
+	stdoss.SetContent("")
+	stdoss.SetResource(resource)
+	stdoss.PrepReq()
+	status, _, _ := stdoss.Do()
+	return status
+}
 
+func CreateBucket(bucket string) int {
+	stdoss.SetMethod(METHOD_PUT)
+	stdoss.SetBucket(bucket)
+	stdoss.SetContentType(MIMETYPE["default"])
+	stdoss.SetContent("")
+	stdoss.SetResource("")
+	stdoss.PrepReq()
+	status, _, _ := stdoss.Do()
+	return status
+}
+
+func RemoveBucket(bucket string) int {
+	stdoss.SetMethod(METHOD_DELETE)
+	stdoss.SetBucket(bucket)
+	stdoss.SetContentType(MIMETYPE["default"])
+	stdoss.SetContent("")
+	stdoss.SetResource("")
+	stdoss.PrepReq()
+	status, _, _ := stdoss.Do()
+	return status
 }

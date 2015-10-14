@@ -11,10 +11,12 @@ import (
 )
 
 const (
-	PORT    string = ":8060"
-	BUCKET  string = "6ry-poi"
-	LAYOUT  string = "2006_01_02"
-	LOG_DIR string = "./log/"
+	PORT           string = ":8060"
+	BUCKET         string = "/6ry-poi"
+	LAYOUT         string = "2006_01_02"
+	LOG_DIR        string = "./log/"
+	OSS_ACCESS_ID  string = "tGSMECQgqidUQdju"
+	OSS_ACCESS_KEY string = "qB2uk2FdJqVGeUYXOXswaKXsfipK4E"
 )
 
 type MyHandler func(http.ResponseWriter, *http.Request)
