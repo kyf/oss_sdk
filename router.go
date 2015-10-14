@@ -13,6 +13,7 @@ func (rou router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	p := r.URL.Path
 	for reg, handler := range ROUTER {
 		if reg.MatchString(p) {
+			w.Header().Add("Access-Control-Allow-Origin", "*")
 			handler(w, r)
 			return
 		}
