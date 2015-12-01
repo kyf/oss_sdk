@@ -15,8 +15,8 @@ const (
 	BUCKET         string = "/6ry-poi"
 	LAYOUT         string = "2006_01_02"
 	LOG_DIR        string = "./log/"
-	OSS_ACCESS_ID  string = "tGSMECQgqidUQdju"
-	OSS_ACCESS_KEY string = "qB2uk2FdJqVGeUYXOXswaKXsfipK4E"
+	OSS_ACCESS_ID  string = "OSS_ACCESS_ID"
+	OSS_ACCESS_KEY string = "OSS_ACCESS_KEY"
 )
 
 type MyHandler func(http.ResponseWriter, *http.Request)
