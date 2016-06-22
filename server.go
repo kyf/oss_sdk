@@ -11,13 +11,11 @@ import (
 )
 
 const (
-	PORT           string = ":8010"
-	SSLPORT        string = ":4431"
-	BUCKET         string = "/6ry-poi"
-	LAYOUT         string = "2006_01_02"
-	LOG_DIR        string = "./log/"
-	OSS_ACCESS_ID  string = "OSS_ACCESS_ID"
-	OSS_ACCESS_KEY string = "OSS_ACCESS_KEY"
+	PORT    string = ":8010"
+	SSLPORT string = ":4431"
+	BUCKET  string = "/6ry-poi"
+	LAYOUT  string = "2006_01_02"
+	LOG_DIR string = "./log/"
 
 	CERT_FILE = "./certs/6ry.crt"
 	KEY_FILE  = "./certs/6ry.key"
@@ -33,6 +31,9 @@ var (
 	last_handler     *os.File                     = nil
 	last_logger      *log.Logger                  = nil
 	last_logger_date string                       = ""
+
+	OSS_ACCESS_ID  string = os.Getenv("OSS_ACCESS_ID")
+	OSS_ACCESS_KEY string = os.Getenv("OSS_ACCESS_KEY")
 )
 
 func logContent(log_str string) {
