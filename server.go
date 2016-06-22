@@ -12,11 +12,15 @@ import (
 
 const (
 	PORT           string = ":8010"
+	SSLPORT        string = ":4431"
 	BUCKET         string = "/6ry-poi"
 	LAYOUT         string = "2006_01_02"
 	LOG_DIR        string = "./log/"
-	OSS_ACCESS_ID  string = "tGSMECQgqidUQdju"
-	OSS_ACCESS_KEY string = "qB2uk2FdJqVGeUYXOXswaKXsfipK4E"
+	OSS_ACCESS_ID  string = "OSS_ACCESS_ID"
+	OSS_ACCESS_KEY string = "OSS_ACCESS_KEY"
+
+	CERT_FILE = "./certs/6ry.crt"
+	KEY_FILE  = "./certs/6ry.key"
 )
 
 type MyHandler func(http.ResponseWriter, *http.Request)
@@ -86,6 +90,12 @@ func main() {
 	r := NewRouter()
 
 	logger("server is startting ...")
+	go func() {
+		err := http.ListenAndServeTLS(SSLPORT, CERT_FILE, KEY_FILE, r)
+		if err != nil {
+			logger(err)
+		}
+	}()
 	err := http.ListenAndServe(PORT, r)
 	if err != nil {
 		logger(err)
