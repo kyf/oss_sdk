@@ -166,6 +166,18 @@ func Create(bucket, resource, content string) int {
 	return status
 }
 
+func CreateApk(bucket, resource, content string) int {
+	stdoss.SetOSSHeader("x-oss-acl", "public-read")
+	stdoss.SetMethod(METHOD_PUT)
+	stdoss.SetBucket(bucket)
+	stdoss.SetContentType(MIMETYPE["apk"])
+	stdoss.SetContent(content)
+	stdoss.SetResource(resource)
+	stdoss.PrepReq()
+	status, _, _ := stdoss.Do()
+	return status
+}
+
 func Remove(bucket, resource string) int {
 	stdoss.SetMethod(METHOD_DELETE)
 	stdoss.SetBucket(bucket)
