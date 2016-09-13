@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	//ENDPOINT   string = "oss-cn-beijing.aliyuncs.com"
+	//ENDPOINT string = "oss-cn-beijing.aliyuncs.com"
 	ENDPOINT   string = "oss-cn-beijing-internal.aliyuncs.com"
 	GMT_LAYOUT string = "Mon, 02 Jan 2006 15:04:05 GMT"
 
@@ -93,6 +93,7 @@ func (o *oss) Do() (int, http.Header, []byte) {
 	res, err := client.Do(o.req)
 	if err != nil {
 		logger(err)
+		return http.StatusInternalServerError, make(http.Header), nil
 	}
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
