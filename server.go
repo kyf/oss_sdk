@@ -17,8 +17,8 @@ const (
 	LAYOUT  string = "2006_01_02"
 	LOG_DIR string = "./log/"
 
-	CERT_FILE = "./certs/6ry.crt"
-	KEY_FILE  = "./certs/6ry.key"
+	CERT_FILE = "/cert/6ry_cert/6ry.crt"
+	KEY_FILE  = "/cert/6ry_cert/6ry.key"
 )
 
 type MyHandler func(http.ResponseWriter, *http.Request)
